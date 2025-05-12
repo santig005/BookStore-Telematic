@@ -12,3 +12,8 @@ class Config:
         ':3306/bookstore'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    CATALOG_SERVICE_URL = os.getenv(
+    'CATALOG_SERVICE_URL',
+    'http://127.0.0.1:5003'
+    )

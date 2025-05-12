@@ -1,8 +1,7 @@
-# auth_service/app.py
 from flask import Flask
 from flask_login import LoginManager
 from .config import Config
-from .extensions import db              # <<— your single db instance
+from .extensions import db
 from .controller.auth_controller import bp as auth_bp, login_manager as auth_login_manager
 
 def create_app():

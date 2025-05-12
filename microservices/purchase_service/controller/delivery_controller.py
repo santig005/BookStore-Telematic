@@ -2,14 +2,12 @@ import requests
 from flask import (
     Blueprint,
     request,
-    render_template,
-    redirect,
-    current_app,
-    jsonify
+    jsonify,
+    current_app
 )
-from ..extensions import db
-from ..models.delivery import DeliveryProvider
-from ..models.delivery_assignment import DeliveryAssignment
+from extensions import db
+from models.delivery import DeliveryProvider
+from models.delivery_assignment import DeliveryAssignment
 
 delivery = Blueprint('delivery', __name__, url_prefix='/delivery')
 AUTH_SERVICE_URL = 'http://127.0.0.1:5000/auth'
@@ -41,23 +39,20 @@ def select_delivery(purchase_id):
         try:
             provider_id = int(raw)
         except (TypeError, ValueError):
-            return jsonify({'error':'provider id must be an integer'}), 400
+            return jsonify({'error': 'provider id must be an integer'}), 400
 
         assignment = DeliveryAssignment(
-            purchase_id = purchase_id,
-            provider_id = provider_id
+            purchase_id=purchase_id,
+            provider_id=provider_id
         )
         db.session.add(assignment)
         db.session.commit()
 
-        # ←— build external Catalog URL and redirect there
-        catalog_base = current_app.config['CATALOG_SERVICE_URL']
-        # if your Catalog mounts its `catalog()` at GET /book/catalog:
-        return redirect(f"{catalog_base}/book/catalog")
+        # Devolver una respuesta JSON en lugar de redirigir
+        return jsonify({'message': 'Delivery assignment successful'}), 200
 
-    # GET: show options
-    return render_template(
-        'delivery_options.html',
-        providers=providers,
-        purchase_id=purchase_id
-    )
+    # GET: devolver opciones de entrega como JSON
+    return jsonify({
+        'providers': [{'id': p.id, 'name': p.name} for p in providers],
+        'purchase_id': purchase_id
+    })

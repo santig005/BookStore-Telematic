@@ -2,12 +2,12 @@
 
 import os
 from flask import Flask, render_template
-from .config     import Config
-from .extensions import db
+from config     import Config
+from extensions import db
 
-from .controller.purchase_controller import purchase   as purchase_bp
-from .controller.payment_controller  import payment    as payment_bp
-from .controller.delivery_controller import delivery   as delivery_bp
+from controller.purchase_controller import purchase   as purchase_bp
+from controller.payment_controller  import payment    as payment_bp
+from controller.delivery_controller import delivery   as delivery_bp
 
 def create_app():
     app = Flask(

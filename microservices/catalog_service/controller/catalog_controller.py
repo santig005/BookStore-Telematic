@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from ..models.book import Book
-from ..extensions import db
+from models.book import Book
+from extensions import db
 
 catalog = Blueprint('catalog', __name__)
 

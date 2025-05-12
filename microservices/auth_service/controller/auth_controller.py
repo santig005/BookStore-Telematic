@@ -7,8 +7,8 @@ from flask_login import (
     LoginManager
 )
 from werkzeug.security import generate_password_hash, check_password_hash
-from ..extensions import db
-from ..models.user import User
+from extensions import db
+from models.user import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 

@@ -1,8 +1,8 @@
 import requests
-from flask import Blueprint, request, render_template, redirect, url_for, jsonify
-from ..extensions import db
-from ..models.payment import Payment
-from ..models.purchase import Purchase
+from flask import Blueprint, request, jsonify
+from extensions import db
+from models.payment import Payment
+from models.purchase import Purchase
 
 payment = Blueprint('payment', __name__, url_prefix='/payment')
 AUTH_SERVICE_URL = 'http://127.0.0.1:5000/auth'
@@ -42,6 +42,12 @@ def payment_page(purchase_id):
 
         db.session.add(pay)
         db.session.commit()
-        return redirect(url_for('delivery.select_delivery', purchase_id=purchase_id))
+        
+        # Devolver una respuesta JSON en lugar de redirigir
+        return jsonify({'message': 'Payment successful'}), 200
 
-    return render_template('payment.html', purchase_id=purchase_id)
+    # GET: devolver información de pago como JSON
+    return jsonify({
+        'purchase_id': purchase_id,
+        'status': purchase.status
+    })

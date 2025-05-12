@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_login import LoginManager
-from .config import Config
-from .extensions import db
-from .controller.auth_controller import bp as auth_bp, login_manager as auth_login_manager
+from config import Config
+from extensions import db
+from controller.auth_controller import bp as auth_bp, login_manager as auth_login_manager
 
 def create_app():
     app = Flask(__name__)
@@ -25,4 +25,4 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    create_app().run(debug=True, host='0.0.0.0')
+    create_app().run(debug=True, host='0.0.0.0', port=5001)

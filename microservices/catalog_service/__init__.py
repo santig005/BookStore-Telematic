@@ -1,0 +1,1 @@
+# This file makes the catalog_service directory a Python package 

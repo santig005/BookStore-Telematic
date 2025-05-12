@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Carrito de Compras</h2>
+
+{% if cart.items %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items %}
+                <tr>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.author }}</td>
+                    <td>${{ item.price }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.price * item.quantity }}</td>
+                    <td>
+                        <form action="{{ url_for('cart.remove_from_cart', book_id=item.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4"><strong>Total:</strong></td>
+                    <td colspan="2"><strong>${{ cart.total }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ url_for('catalog.index') }}" class="btn btn-secondary">Seguir Comprando</a>
+        <form action="{{ url_for('cart.checkout') }}" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-success">Realizar Compra</button>
+        </form>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        Tu carrito está vacío. <a href="{{ url_for('catalog.index') }}">¡Agrega algunos libros!</a>
+    </div>
+{% endif %}
+{% endblock %} 

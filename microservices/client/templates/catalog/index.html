@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Catálogo de Libros</h2>
+<div class="row">
+  {% for book in books %}
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">{{ book.title }}</h5>
+        <p class="card-text">Autor: {{ book.author }}</p>
+        <p class="card-text">Precio: ${{ book.price }}</p>
+        <p class="card-text">{{ book.description }}</p>
+        
+        {% if book.stock > 0 %}
+          <p class="card-text">
+            <strong>Unidades disponibles:</strong> {{ book.stock }}
+          </p>
+          <form method="POST" action="{{ url_for('catalog.add_to_cart', book_id=book.id) }}">
+            <input type="hidden" name="price" value="{{ book.price }}">
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Cantidad:</label>
+              <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="1" max="{{ book.stock }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar al Carrito</button>
+          </form>
+        {% else %}
+          <p class="card-text">
+            <strong class="text-danger">No disponibles</strong>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if not books %}
+<div class="alert alert-info">
+  No hay libros disponibles en este momento.
+</div>
+{% endif %}
+{% endblock %} 

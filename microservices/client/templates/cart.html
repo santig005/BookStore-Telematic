@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}BookStore - Carrito{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4">
+            <i class="fas fa-shopping-cart"></i> Carrito de Compras
+        </h1>
+    </div>
+</div>
+
+{% if cart.items %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th><i class="fas fa-book"></i> Título</th>
+                    <th><i class="fas fa-user"></i> Autor</th>
+                    <th><i class="fas fa-tag"></i> Precio</th>
+                    <th><i class="fas fa-cog"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items %}
+                <tr>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.author }}</td>
+                    <td class="price">${{ item.price }}</td>
+                    <td>
+                        <form action="" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <td colspan="2"><strong>Total:</strong></td>
+                    <td colspan="2" class="price">${{ cart.total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Seguir Comprando
+        </a>
+        <form action="" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-check"></i> Realizar Compra
+            </button>
+        </form>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Tu carrito está vacío. 
+        <a href="{{ url_for('index') }}" class="alert-link">
+            <i class="fas fa-shopping-basket"></i> ¡Agrega algunos libros!
+        </a>
+    </div>
+{% endif %}
+{% endblock %} 

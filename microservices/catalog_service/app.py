@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
-from extensions import db
-from config import Config
-from controller.catalog_controller import catalog
+from .extensions import db
+from .config import Config
+from .controller.catalog_controller import catalog
 
 def create_app():
     app = Flask(__name__)
@@ -27,4 +27,4 @@ def init_db(app):
 if __name__ == '__main__':
     app = create_app()
     init_db(app)
-    app.run(host='0.0.0.0', port=5002, debug=True) 
+    app.run(host='0.0.0.0', port=5003, debug=True) 

@@ -2,67 +2,55 @@ version: "3.0"
 services:
   auth_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/auth_service:latest
-    deploy:
-      replicas: 2  # Start with 2 replicas
-      resources:
-        limits:
-          cpu: "0.5" # Set CPU limits
-          memory: 512M # Set Memory limits
-      restart_policy:
-        condition: on-failure
     ports:
-      - "5001:5001" # Host:Container
+      - "5001:5001"
     networks:
       - bookstore_network
+    cpu_limit: 0.5  # Equivalent of cpu: "0.5" in later versions
+    mem_limit: 512M # Equivalent of memory: 512M in later versions
+    restart: on-failure # Equivalent of restart_policy: condition: on-failure
+    deploy:
+      replicas: 2 # This line will be ignored, replica count handled by docker service scale
 
   catalog_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/catalog_service:latest
-    deploy:
-      replicas: 2  # Start with 3 replicas
-      resources:
-        limits:
-          cpu: "0.75"
-          memory: 768M
-      restart_policy:
-        condition: on-failure
     ports:
-      - "5003:5003" # Host:Container
+      - "5003:5003"
     networks:
       - bookstore_network
+    cpu_limit: 0.75
+    mem_limit: 768M
+    restart: on-failure
+    deploy:
+      replicas: 2
 
   purchase_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/purchase_service:latest
-    deploy:
-      replicas: 2  # Start with 4 replicas
-      resources:
-        limits:
-          cpu: "1.0"
-          memory: 1024M
-      restart_policy:
-        condition: on-failure
     ports:
-      - "5002:5002" # Host:Container
+      - "5002:5002"
     networks:
       - bookstore_network
+    cpu_limit: 1.0
+    mem_limit: 1024M
+    restart: on-failure
+    deploy:
+      replicas: 2
 
   client: # This is where your load balancer will forward traffic to.
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/client:latest
-    deploy:
-      replicas: 2
-      resources:
-        limits:
-          cpu: "0.5"
-          memory: 512M
-      restart_policy:
-        condition: on-failure
     ports:
-      - "80:5000" # Host port 80 (or 443 for HTTPS) to container port 5003
+      - "80:5000" # Host port 80 (or 443 for HTTPS) to container port 5000
     networks:
       - bookstore_network
     depends_on:
       - auth_service
       - catalog_service
       - purchase_service
+    cpu_limit: 0.5
+    mem_limit: 512M
+    restart: on-failure
+    deploy:
+      replicas: 2
 
 networks:
   bookstore_network:

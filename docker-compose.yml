@@ -1,4 +1,4 @@
-version: "3.0"
+version: "2.4"
 services:
   auth_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/auth_service:latest
@@ -6,11 +6,9 @@ services:
       - "5001:5001"
     networks:
       - bookstore_network
-    cpu_limit: 0.5  # Equivalent of cpu: "0.5" in later versions
-    mem_limit: 512M # Equivalent of memory: 512M in later versions
-    restart: on-failure # Equivalent of restart_policy: condition: on-failure
-    deploy:
-      replicas: 2 # This line will be ignored, replica count handled by docker service scale
+    mem_limit: 512M # Memory limit
+    restart: on-failure
+    #No Deploy Section
 
   catalog_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/catalog_service:latest
@@ -18,11 +16,9 @@ services:
       - "5003:5003"
     networks:
       - bookstore_network
-    cpu_limit: 0.75
     mem_limit: 768M
     restart: on-failure
-    deploy:
-      replicas: 2
+    #No Deploy Section
 
   purchase_service:
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/purchase_service:latest
@@ -30,11 +26,9 @@ services:
       - "5002:5002"
     networks:
       - bookstore_network
-    cpu_limit: 1.0
     mem_limit: 1024M
     restart: on-failure
-    deploy:
-      replicas: 2
+    #No Deploy Section
 
   client: # This is where your load balancer will forward traffic to.
     image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/client:latest
@@ -46,11 +40,9 @@ services:
       - auth_service
       - catalog_service
       - purchase_service
-    cpu_limit: 0.5
     mem_limit: 512M
     restart: on-failure
-    deploy:
-      replicas: 2
+    #No Deploy Section
 
 networks:
   bookstore_network:

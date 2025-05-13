@@ -5,7 +5,7 @@ WORKDIR /app
 COPY microservices/catalog_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY microservices/auth_service/. .
+COPY . .
 
 EXPOSE 5003
 

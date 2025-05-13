@@ -26,11 +26,13 @@ def login():
 
             if response.status_code == 200:
                 user_data = response.json()
+                print("la user data es:", user_data)
                 # Guardar información del usuario en la sesión
                 session['user_id'] = user_data.get('id')
-                session['user_name'] = user_data.get('name')
+                session['user_name'] = user_data.get('user_name')
                 session['user_email'] = user_data.get('email')
                 flash('Inicio de sesión exitoso', 'success')
+                print("los datosss son;", session['user_name'])
                 return redirect(url_for('catalog.index'))
             else:
                 flash('Credenciales inválidas', 'error')

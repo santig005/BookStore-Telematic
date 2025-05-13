@@ -1,72 +1,45 @@
-import requests
 from flask import Blueprint, request, jsonify
-from extensions import db
-from models.book import Book
 from models.purchase import Purchase
+from models.book import Book
+from extensions import db
 
 purchase = Blueprint('purchase', __name__, url_prefix='/purchase')
-AUTH_SERVICE_URL = 'http://127.0.0.1:5000/auth'
-
-def get_current_user():
-    cookie = request.cookies.get('session')
-    if not cookie:
-        return None
-    resp = requests.get(f'{AUTH_SERVICE_URL}/whoami',
-                        cookies={'session': cookie},
-                        timeout=2)
-    if resp.status_code != 200:
-        return None
-    return resp.json()
 
 @purchase.route('/buy/<int:book_id>', methods=['POST'])
 def buy(book_id):
-    user = get_current_user()
-    if not user:
-        return jsonify({'error': 'Login required'}), 401
+    # 1) Parse JSON payload
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'user_id required'}), 401
 
-    # Support both JSON and form posts:
-    if request.is_json:
-        data      = request.get_json()
-        raw_qty   = data.get('quantity')
-        raw_price = data.get('price')
-    else:
-        raw_qty   = request.form.get('quantity')
-        raw_price = request.form.get('price')
-
-    # Validate presence
-    if raw_qty is None or raw_price is None:
-        return jsonify({'error': 'quantity and price are required'}), 400
-
-    # Convert types safely
+    # 2) Extract quantity & price
     try:
-        quantity = int(raw_qty)
-        price    = float(raw_price)
+        quantity = int(data.get('quantity', 1))
+        price    = float(data.get('price', 0))
     except (ValueError, TypeError):
-        return jsonify({'error': 'quantity must be integer and price numeric'}), 400
+        return jsonify({'error': 'Invalid quantity or price'}), 400
 
-    # ←– New: explicit lookup & not-found handling
-    book = Book.query.get(book_id)
-    if book is None:
-        return jsonify({'error': f'Book with id {book_id} not found'}), 404
-
+    # 3) Load book and check stock
+    book = Book.query.get_or_404(book_id)
     if book.stock < quantity:
         return jsonify({'error': 'Insufficient stock'}), 400
 
-    total = price * quantity
-    purchase = Purchase(
-        user_id     = user['id'],
-        book_id     = book_id,
-        quantity    = quantity,
-        total_price = total,
-        status      = 'Pending Payment'
+    # 4) Create Purchase and decrement stock
+    total_price = price * quantity
+    new_purchase = Purchase(
+        user_id=user_id,
+        book_id=book_id,
+        quantity=quantity,
+        total_price=total_price,
+        status='Pending Payment'
     )
-
     book.stock -= quantity
-    db.session.add(purchase)
+    db.session.add(new_purchase)
     db.session.commit()
 
-    # Devolver una respuesta JSON en lugar de redirigir
+    # 5) Return JSON for client to continue flow
     return jsonify({
-        'message': 'Purchase successful',
-        'purchase_id': purchase.id
-    }), 200
+        'purchase_id': new_purchase.id,
+        'total_price': total_price
+    }), 201

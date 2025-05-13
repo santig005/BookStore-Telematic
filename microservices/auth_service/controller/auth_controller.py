@@ -54,13 +54,13 @@ def login():
         return jsonify({'message': 'Invalid email or password'}), 401
 
     login_user(user)
-    return jsonify({'message': 'Logged in successfully'}), 200
 
-@bp.route('/logout', methods=['POST'])
-@login_required
-def logout():
-    logout_user()
-    return jsonify({'message': 'Logged out successfully'}), 200
+    return jsonify({
+        'message': 'Logged in successfully',
+        'id':    user.id,
+        'email': user.email,
+        'name':  user.name
+    }), 200
 
 @bp.route('/whoami', methods=['GET'])
 @login_required

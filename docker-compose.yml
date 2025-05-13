@@ -1,35 +1,69 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_DATABASE: bookstore
-      MYSQL_USER: bookstore_user
-      MYSQL_PASSWORD: bookstore_pass
-      MYSQL_ROOT_PASSWORD: root_pass
+  auth_service:
+    image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/auth_service:latest
+    deploy:
+      replicas: 2  # Start with 2 replicas
+      resources:
+        limits:
+          cpu: "0.5" # Set CPU limits
+          memory: 512M # Set Memory limits
+      restart_policy:
+        condition: on-failure
     ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
+      - "5001:5001" # Host:Container
     networks:
-      - bookstore_net
+      - bookstore_network
 
-  flaskapp:
-    build: .
-    restart: always
-    environment:
-      - FLASK_ENV=development
+  catalog_service:
+    image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/catalog_service:latest
+    deploy:
+      replicas: 2  # Start with 3 replicas
+      resources:
+        limits:
+          cpu: "0.75"
+          memory: 768M
+      restart_policy:
+        condition: on-failure
     ports:
-      - "5000:5000"
+      - "5003:5003" # Host:Container
+    networks:
+      - bookstore_network
+
+  purchase_service:
+    image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/purchase_service:latest
+    deploy:
+      replicas: 2  # Start with 4 replicas
+      resources:
+        limits:
+          cpu: "1.0"
+          memory: 1024M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "5002:5002" # Host:Container
+    networks:
+      - bookstore_network
+
+  client: # This is where your load balancer will forward traffic to.
+    image: 289116546479.dkr.ecr.us-east-1.amazonaws.com/client:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpu: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:5000" # Host port 80 (or 443 for HTTPS) to container port 5003
+    networks:
+      - bookstore_network
     depends_on:
-      - db
-    networks:
-      - bookstore_net
-
-volumes:
-  db_data:
+      - auth_service
+      - catalog_service
+      - purchase_service
 
 networks:
-  bookstore_net:
+  bookstore_network:
+    driver: overlay
